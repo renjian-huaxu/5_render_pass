@@ -43,7 +43,16 @@
             loader.loadAscii("obj/walt/WaltHead_slim.js", function (geometry) {
 
                 //object = new MThree.Mesh( geometry, new MThree.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: MThree.FlatShading } )  );
-                object = new MThree.Mesh(geometry, new MThree.MeshPhongMaterial({ ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: MThree.PhongShading }));
+                object = new MThree.Mesh(
+                    geometry, 
+                    new MThree.MeshPhongMaterial({ 
+                        ambient: 0x555555, 
+                        color: 0x555555, 
+                        specular: 0xffffff, 
+                        shininess: 50, 
+                        shading: MThree.PhongShading 
+                    })
+                );
                 object.scale.x = object.scale.y = object.scale.z = 0.80;
                 object.overdraw = true;
                 scene.addObject(object);

@@ -84,8 +84,11 @@ export default class WebGLRenderer {
 		let _program = this._program
 
 		var r, g, b,
-			ambientLights = [], pointLights = [], directionalLights = [],
-			colors = [], positions = [];
+			ambientLights = [], 
+			pointLights = [], 
+			directionalLights = [],
+			colors = [], 
+			positions = [];
 
 		_gl.uniform1i(_program.enableLighting, scene.lights.length);
 
@@ -217,8 +220,6 @@ export default class WebGLRenderer {
 
 		materialFaceGroup.faces.forEach(fi => {
 
-			let v1, v2, v3, v4
-
 			let face = object.geometry.faces[fi];
 			let vertexNormals = face.vertexNormals;
 			let normal = face.normal;
@@ -226,9 +227,9 @@ export default class WebGLRenderer {
 
 			if (face instanceof Face3) {
 
-				v1 = object.geometry.vertices[face.a].position;
-				v2 = object.geometry.vertices[face.b].position;
-				v3 = object.geometry.vertices[face.c].position;
+				const v1 = object.geometry.vertices[face.a].position;
+				const v2 = object.geometry.vertices[face.b].position;
+				const v3 = object.geometry.vertices[face.c].position;
 
 				vertexArray.push(v1.x, v1.y, v1.z);
 				vertexArray.push(v2.x, v2.y, v2.z);
@@ -268,10 +269,10 @@ export default class WebGLRenderer {
 
 			} else if (face instanceof Face4) {
 
-				v1 = object.geometry.vertices[face.a].position;
-				v2 = object.geometry.vertices[face.b].position;
-				v3 = object.geometry.vertices[face.c].position;
-				v4 = object.geometry.vertices[face.d].position;
+				const v1 = object.geometry.vertices[face.a].position;
+				const v2 = object.geometry.vertices[face.b].position;
+				const v3 = object.geometry.vertices[face.c].position;
+				const v4 = object.geometry.vertices[face.d].position;
 
 				vertexArray.push(v1.x, v1.y, v1.z);
 				vertexArray.push(v2.x, v2.y, v2.z);
