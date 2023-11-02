@@ -25,7 +25,7 @@
 
         init();
         loop()
-        // setInterval(loop, 1000 / 60);
+        setInterval(loop, 1000 / 60);
 
         function init() {
 
@@ -73,40 +73,40 @@
                 overdraw: false, doubleSided: true 
             });
             
-                // materials.push( { 
-                //     material: new MThree.MeshBasicMaterial( { color: 0xff0000, blending: MThree.SubtractiveBlending } ), 
-                //     overdraw: false, doubleSided: true 
-                // });
+                materials.push( { 
+                    material: new MThree.MeshBasicMaterial( { color: 0xff0000, blending: MThree.SubtractiveBlending } ), 
+                    overdraw: false, doubleSided: true 
+                });
 
-            // materials.push({ 
-            //     material: new MThree.MeshBasicMaterial({ color: 0xff0000, blending: MThree.AdditiveBlending }),
-            //     overdraw: false, doubleSided: true 
-            // })
+            materials.push({ 
+                material: new MThree.MeshBasicMaterial({ color: 0xff0000, blending: MThree.AdditiveBlending }),
+                overdraw: false, doubleSided: true 
+            })
 
-            // materials.push({
-            //     material: new MThree.MeshLambertMaterial({ color: 0xffffff }), 
-            //     overdraw: true, doubleSided: false 
-            // })
+            materials.push({
+                material: new MThree.MeshLambertMaterial({ color: 0xffffff }), 
+                overdraw: true, doubleSided: false 
+            })
 
-            // materials.push({
-            //     material: new MThree.MeshPhongMaterial({ ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10 }), 
-            //     overdraw: true, doubleSided: false 
-            // })
+            materials.push({
+                material: new MThree.MeshPhongMaterial({ ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10 }), 
+                overdraw: true, doubleSided: false 
+            })
 
-            // materials.push({ 
-            //     material: new MThree.MeshDepthMaterial({ near: 1, far: 2000 }), 
-            //     overdraw: true, doubleSided: false 
-            // })
+            materials.push({ 
+                material: new MThree.MeshDepthMaterial({ near: 1, far: 2000 }), 
+                overdraw: true, doubleSided: false 
+            })
 
-            // materials.push({ 
-            //     material: new MThree.MeshNormalMaterial(), 
-            //     overdraw: true, doubleSided: false 
-            // })
+            materials.push({ 
+                material: new MThree.MeshNormalMaterial(), 
+                overdraw: true, doubleSided: false 
+            })
             
-            // materials.push({ 
-            //     material: new MThree.MeshBasicMaterial({ map: generatedTexture }), 
-            //     overdraw: true, doubleSided: false 
-            // })
+            materials.push({ 
+                material: new MThree.MeshBasicMaterial({ map: generatedTexture }), 
+                overdraw: true, doubleSided: false 
+            })
 
             objects = [];
 

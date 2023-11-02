@@ -6,6 +6,7 @@ const MeshBasicMaterialCounter = { value: 0 };
 export default class MeshBasicMaterial {
 
     constructor(parameters) {
+
         this.id = MeshBasicMaterialCounter.value ++;
 
         this.color = new Color( 0xeeeeee );
@@ -28,6 +29,7 @@ export default class MeshBasicMaterial {
     }
 
     toString() {
+        
         return 'THREE.MeshBasicMaterial (<br/>' +
         'id: ' + this.id + '<br/>' +
         'color: ' + this.color + '<br/>' +

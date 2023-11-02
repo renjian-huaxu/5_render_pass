@@ -29,6 +29,7 @@ export default class WebGLRenderer {
 	_program
 
 	constructor(scene) {
+
 		this.scene = scene
 		this.domElement = this._canvas
 		this.maxLightCount = this.allocateLights(scene, 5);
@@ -38,6 +39,7 @@ export default class WebGLRenderer {
 	}
 
 	allocateLights(scene, maxLights) {
+		
 		if (scene) {
 
 			var dirLights = 0, pointLights = 0, maxDirLights = 0, maxPointLights = 0;
@@ -75,11 +77,14 @@ export default class WebGLRenderer {
 	}
 
 	clear() {
+
 		let _gl = this._gl
 		_gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+
 	}
 
 	setupLights(scene) {
+
 		let _gl = this._gl
 		let _program = this._program
 
@@ -195,7 +200,7 @@ export default class WebGLRenderer {
 
 		}
 
-		object.material.forEach(meshMaterial => {
+		object.materials.forEach(meshMaterial => {
 			if (meshMaterial instanceof MeshFaceMaterial) {
 
 				materialFaceGroup.material.forEach(material => {
@@ -353,7 +358,7 @@ export default class WebGLRenderer {
 	renderBuffer(material, materialFaceGroup) {
 		let _gl = this._gl
 		let _program = this._program
-		let mColor, mOpacity, mLineWidth, mWireframe, mBlending, mMap, mAmbient, mSpecular, mShininess
+		let mColor, mOpacity, mLineWidth, mWireframe,  mMap, mAmbient, mSpecular, mShininess
 
 		if (material instanceof MeshPhongMaterial ||
 			material instanceof MeshLambertMaterial ||
@@ -365,8 +370,6 @@ export default class WebGLRenderer {
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
 
-			mBlending = material.blending;
-
 			mMap = material.map;
 
 			_gl.uniform4f(_program.mColor, mColor.r * mOpacity, mColor.g * mOpacity, mColor.b * mOpacity, mOpacity);
@@ -376,7 +379,6 @@ export default class WebGLRenderer {
 		if (material instanceof MeshNormalMaterial) {
 
 			mOpacity = material.opacity;
-			mBlending = material.blending;
 
 			_gl.uniform1f(_program.mOpacity, mOpacity);
 
@@ -491,7 +493,7 @@ export default class WebGLRenderer {
 
 	renderPass(object, materialFaceGroup, blending) {
 		
-		object.material.forEach(meshMaterial => {
+		object.materials.forEach(meshMaterial => {
 			if (meshMaterial instanceof MeshFaceMaterial) {
 
 				materialFaceGroup.material.forEach(material => {
@@ -687,8 +689,8 @@ export default class WebGLRenderer {
 
 		}
 
-		_gl.clearColor(0, 0, 0, 1);
-		_gl.clearDepth(1);
+		// _gl.clearColor(0, 0, 0, 1);
+		// _gl.clearDepth(1);
 
 		_gl.enable(_gl.DEPTH_TEST);
 		_gl.depthFunc(_gl.LEQUAL);
@@ -701,176 +703,12 @@ export default class WebGLRenderer {
 		//_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
 		//_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE ); // cool!
 		_gl.blendFunc(_gl.ONE, _gl.ONE_MINUS_SRC_ALPHA);
+		
 		_gl.clearColor(0, 0, 0, 0);
 
 		this._gl = _gl
 	}
-
-	generateFragmentShader(maxDirLights, maxPointLights) {
-		const chunks = [
-
-			"#ifdef GL_ES",
-			"precision highp float;",
-			"#endif",
-
-			maxDirLights ? "#define MAX_DIR_LIGHTS " + maxDirLights : "",
-			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
-
-			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal
-
-			"uniform bool enableMap;",
-
-			"uniform sampler2D tMap;",
-			"uniform vec4 mColor;",
-			"uniform float mOpacity;",
-
-			"uniform vec4 mAmbient;",
-			"uniform vec4 mSpecular;",
-			"uniform float mShininess;",
-
-			"uniform float m2Near;",
-			"uniform float mFarPlusNear;",
-			"uniform float mFarMinusNear;",
-
-			"uniform int pointLightNumber;",
-			"uniform int directionalLightNumber;",
-
-			maxDirLights ? "uniform mat4 viewMatrix;" : "",
-			maxDirLights ? "uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];" : "",
-
-			"varying vec3 vNormal;",
-			"varying vec2 vUv;",
-
-			"varying vec3 vLightWeighting;",
-
-			maxPointLights ? "varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];" : "",
-
-			"varying vec3 vViewPosition;",
-
-			"void main() {",
-
-			"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
-
-			"if ( enableMap ) {",
-
-			"mapColor = texture2D( tMap, vUv );",
-
-			"}",
-
-			// Normals
-
-			"if ( material == 4 ) { ",
-
-			"gl_FragColor = vec4( 0.5*normalize( vNormal ) + vec3(0.5, 0.5, 0.5), mOpacity );",
-
-			// Depth
-
-			"} else if ( material == 3 ) { ",
-
-			// this breaks shader validation in Chrome 9.0.576.0 dev 
-			// and also latest continuous build Chromium 9.0.583.0 (66089)
-			// (curiously it works in Chrome 9.0.576.0 canary build and Firefox 4b7)
-			//"float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );",
-			"float w = 0.5;",
-
-			"gl_FragColor = vec4( w, w, w, mOpacity );",
-
-			// Blinn-Phong
-			// based on o3d example
-
-			"} else if ( material == 2 ) { ",
-
-			"vec3 normal = normalize( vNormal );",
-			"vec3 viewPosition = normalize( vViewPosition );",
-
-			// point lights
-
-			maxPointLights ? "vec4 pointDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
-			maxPointLights ? "vec4 pointSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
-
-			maxPointLights ? "for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {" : "",
-
-			maxPointLights ? "vec3 pointVector = normalize( vPointLightVector[ i ] );" : "",
-			maxPointLights ? "vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );" : "",
-
-			maxPointLights ? "float pointDotNormalHalf = dot( normal, pointHalfVector );" : "",
-			maxPointLights ? "float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );" : "",
-
-			// Ternary conditional is from the original o3d shader. Here it produces abrupt dark cutoff artefacts.
-			// Using just pow works ok in Chrome, but makes different artefact in Firefox 4.
-			// Zeroing on negative pointDotNormalHalf seems to work in both.
-
-			//"float specularCompPoint = dot( normal, pointVector ) < 0.0 || pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
-			//"float specularCompPoint = pow( pointDotNormalHalf, mShininess );",
-			//"float pointSpecularWeight = pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
-
-			// Ternary conditional inside for loop breaks Chrome shader linking.
-			// Must do it with if.
-
-			maxPointLights ? "float pointSpecularWeight = 0.0;" : "",
-			maxPointLights ? "if ( pointDotNormalHalf >= 0.0 )" : "",
-			maxPointLights ? "pointSpecularWeight = pow( pointDotNormalHalf, mShininess );" : "",
-
-			maxPointLights ? "pointDiffuse  += mColor * pointDiffuseWeight;" : "",
-			maxPointLights ? "pointSpecular += mSpecular * pointSpecularWeight;" : "",
-
-			maxPointLights ? "}" : "",
-
-			// directional lights
-
-			maxDirLights ? "vec4 dirDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
-			maxDirLights ? "vec4 dirSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
-
-			maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
-
-			maxDirLights ? "vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
-
-			maxDirLights ? "vec3 dirVector = normalize( lDirection.xyz );" : "",
-			maxDirLights ? "vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );" : "",
-
-			maxDirLights ? "float dirDotNormalHalf = dot( normal, dirHalfVector );" : "",
-
-			maxDirLights ? "float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );" : "",
-
-			maxDirLights ? "float dirSpecularWeight = 0.0;" : "",
-			maxDirLights ? "if ( dirDotNormalHalf >= 0.0 )" : "",
-			maxDirLights ? "dirSpecularWeight = pow( dirDotNormalHalf, mShininess );" : "",
-
-			maxDirLights ? "dirDiffuse  += mColor * dirDiffuseWeight;" : "",
-			maxDirLights ? "dirSpecular += mSpecular * dirSpecularWeight;" : "",
-
-			maxDirLights ? "}" : "",
-
-			// all lights contribution summation
-
-			"vec4 totalLight = mAmbient;",
-			maxDirLights ? "totalLight += dirDiffuse + dirSpecular;" : "",
-			maxPointLights ? "totalLight += pointDiffuse + pointSpecular;" : "",
-
-			// looks nicer with weighting
-
-			"gl_FragColor = vec4( mapColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
-
-			// Lambert: diffuse lighting
-
-			"} else if ( material == 1 ) {",
-
-			"gl_FragColor = vec4( mColor.rgb * mapColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
-
-			// Basic: unlit color / texture
-
-			"} else {",
-
-			"gl_FragColor = mColor * mapColor;",
-
-			"}",
-
-			"}"];
-
-		return chunks.join("\n");
-
-	}
-
+	
 	generateVertexShader(maxDirLights, maxPointLights) {
 		const chunks = [
 
@@ -917,49 +755,214 @@ export default class WebGLRenderer {
 
 			// world space
 
-			"vec4 mPosition = objMatrix * vec4( position, 1.0 );",
-			"vViewPosition = cameraPosition - mPosition.xyz;",
+			"	vec4 mPosition = objMatrix * vec4( position, 1.0 );",
+			"	vViewPosition = cameraPosition - mPosition.xyz;",
 
 			// eye space
 
-			"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-			"vec3 transformedNormal = normalize( normalMatrix * normal );",
+			"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+			"	vec3 transformedNormal = normalize( normalMatrix * normal );",
 
-			"if ( !enableLighting ) {",
+			"		if ( !enableLighting ) {",
 
-			"vLightWeighting = vec3( 1.0, 1.0, 1.0 );",
+			"			vLightWeighting = vec3( 1.0, 1.0, 1.0 );",
 
-			"} else {",
+			"		} else {",
 
-			"vLightWeighting = ambientLightColor;",
+			"		vLightWeighting = ambientLightColor;",
 
 			// directional lights
 
 			maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
-			maxDirLights ? "vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
-			maxDirLights ? "float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );" : "",
-			maxDirLights ? "vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;" : "",
+			maxDirLights ? "	vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
+			maxDirLights ? "	float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );" : "",
+			maxDirLights ? "	vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;" : "",
 			maxDirLights ? "}" : "",
 
 			// point lights
 
 			maxPointLights ? "for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {" : "",
-			maxPointLights ? "vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );" : "",
-			maxPointLights ? "vPointLightVector[ i ] = normalize( lPosition.xyz - mvPosition.xyz );" : "",
-			maxPointLights ? "float pointLightWeighting = max( dot( transformedNormal, vPointLightVector[ i ] ), 0.0 );" : "",
-			maxPointLights ? "vLightWeighting += pointLightColor[ i ] * pointLightWeighting;" : "",
+			maxPointLights ? "	vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );" : "",
+			maxPointLights ? "	vPointLightVector[ i ] = normalize( lPosition.xyz - mvPosition.xyz );" : "",
+			maxPointLights ? "	float pointLightWeighting = max( dot( transformedNormal, vPointLightVector[ i ] ), 0.0 );" : "",
+			maxPointLights ? "	vLightWeighting += pointLightColor[ i ] * pointLightWeighting;" : "",
 			maxPointLights ? "}" : "",
 
-			"}",
+			"	}",
 
-			"vNormal = transformedNormal;",
-			"vUv = uv;",
+			"	vNormal = transformedNormal;",
+			"	vUv = uv;",
 
-			"gl_Position = projectionMatrix * mvPosition;",
+			"	gl_Position = projectionMatrix * mvPosition;",
 
 			"}"];
 
 		return chunks.join("\n");
+	}
+
+	generateFragmentShader(maxDirLights, maxPointLights) {
+		const chunks = [
+
+			"#ifdef GL_ES",
+			"precision highp float;",
+			"#endif",
+
+			maxDirLights ? "#define MAX_DIR_LIGHTS " + maxDirLights : "",
+			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
+
+			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal
+
+			"uniform bool enableMap;",
+
+			"uniform sampler2D tMap;",
+			"uniform vec4 mColor;",
+			"uniform float mOpacity;",
+
+			"uniform vec4 mAmbient;",
+			"uniform vec4 mSpecular;",
+			"uniform float mShininess;",
+
+			"uniform float m2Near;",
+			"uniform float mFarPlusNear;",
+			"uniform float mFarMinusNear;",
+
+			"uniform int pointLightNumber;",
+			"uniform int directionalLightNumber;",
+
+			maxDirLights ? "uniform mat4 viewMatrix;" : "",
+			maxDirLights ? "uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];" : "",
+
+			"varying vec3 vNormal;",
+			"varying vec2 vUv;",
+
+			"varying vec3 vLightWeighting;",
+
+			maxPointLights ? "varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];" : "",
+
+			"varying vec3 vViewPosition;",
+
+			"void main() {",
+
+			"	vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+
+			"	if ( enableMap ) {",
+
+			"		mapColor = texture2D( tMap, vUv );",
+
+			"	}",
+
+			// Normals
+
+			"	if ( material == 4 ) { ",
+
+			"		gl_FragColor = vec4( 0.5*normalize( vNormal ) + vec3(0.5, 0.5, 0.5), mOpacity );",
+
+			// Depth
+
+			"	} else if ( material == 3 ) { ",
+
+			// this breaks shader validation in Chrome 9.0.576.0 dev 
+			// and also latest continuous build Chromium 9.0.583.0 (66089)
+			// (curiously it works in Chrome 9.0.576.0 canary build and Firefox 4b7)
+			//"float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );",
+			"		float w = 0.5;",
+
+			"		gl_FragColor = vec4( w, w, w, mOpacity );",
+
+			// Blinn-Phong
+			// based on o3d example
+
+			"	} else if ( material == 2 ) { ",
+
+			"		vec3 normal = normalize( vNormal );",
+			"		vec3 viewPosition = normalize( vViewPosition );",
+
+			// point lights
+
+			maxPointLights ? "vec4 pointDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
+			maxPointLights ? "vec4 pointSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
+
+			maxPointLights ? "for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {" : "",
+
+			maxPointLights ? "	vec3 pointVector = normalize( vPointLightVector[ i ] );" : "",
+			maxPointLights ? "	vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );" : "",
+
+			maxPointLights ? "	float pointDotNormalHalf = dot( normal, pointHalfVector );" : "",
+			maxPointLights ? "	float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );" : "",
+
+			// Ternary conditional is from the original o3d shader. Here it produces abrupt dark cutoff artefacts.
+			// Using just pow works ok in Chrome, but makes different artefact in Firefox 4.
+			// Zeroing on negative pointDotNormalHalf seems to work in both.
+
+			//"float specularCompPoint = dot( normal, pointVector ) < 0.0 || pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
+			//"float specularCompPoint = pow( pointDotNormalHalf, mShininess );",
+			//"float pointSpecularWeight = pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
+
+			// Ternary conditional inside for loop breaks Chrome shader linking.
+			// Must do it with if.
+
+			maxPointLights ? "	float pointSpecularWeight = 0.0;" : "",
+			maxPointLights ? "	if ( pointDotNormalHalf >= 0.0 )" : "",
+			maxPointLights ? "		pointSpecularWeight = pow( pointDotNormalHalf, mShininess );" : "",
+
+			maxPointLights ? "	pointDiffuse  += mColor * pointDiffuseWeight;" : "",
+			maxPointLights ? "	pointSpecular += mSpecular * pointSpecularWeight;" : "",
+
+			maxPointLights ? "}" : "",
+
+			// directional lights
+
+			maxDirLights ? "vec4 dirDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
+			maxDirLights ? "vec4 dirSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
+
+			maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
+
+			maxDirLights ? "	vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
+
+			maxDirLights ? "	vec3 dirVector = normalize( lDirection.xyz );" : "",
+			maxDirLights ? "	vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );" : "",
+
+			maxDirLights ? "	float dirDotNormalHalf = dot( normal, dirHalfVector );" : "",
+
+			maxDirLights ? "	float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );" : "",
+
+			maxDirLights ? "	float dirSpecularWeight = 0.0;" : "",
+			maxDirLights ? "	if ( dirDotNormalHalf >= 0.0 )" : "",
+			maxDirLights ? "		dirSpecularWeight = pow( dirDotNormalHalf, mShininess );" : "",
+
+			maxDirLights ? "	dirDiffuse  += mColor * dirDiffuseWeight;" : "",
+			maxDirLights ? "	dirSpecular += mSpecular * dirSpecularWeight;" : "",
+
+			maxDirLights ? "}" : "",
+
+			// all lights contribution summation
+
+			"		vec4 totalLight = mAmbient;",
+			maxDirLights ? "totalLight += dirDiffuse + dirSpecular;" : "",
+			maxPointLights ? "totalLight += pointDiffuse + pointSpecular;" : "",
+
+			// looks nicer with weighting
+
+			"		gl_FragColor = vec4( mapColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
+
+			// Lambert: diffuse lighting
+
+			"	} else if ( material == 1 ) {",
+
+			"		gl_FragColor = vec4( mColor.rgb * mapColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
+
+			// Basic: unlit color / texture
+
+			"	} else {",
+
+			"		gl_FragColor = mColor * mapColor;",
+
+			"	}",
+
+			"}"];
+
+		return chunks.join("\n");
+
 	}
 
 	initProgram(maxDirLights, maxPointLights) {

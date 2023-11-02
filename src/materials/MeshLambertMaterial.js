@@ -6,6 +6,7 @@ const MeshLambertMaterialCounter = { value: 0 };
 export default class MeshLambertMaterial {
 
     constructor(parameters) {
+
         this.id = MeshLambertMaterialCounter.value ++;
 
         this.color = new Color( 0xeeeeee );
@@ -30,6 +31,7 @@ export default class MeshLambertMaterial {
     }
 
     toString() {
+        
         return 'THREE.MeshLambertMaterial (<br/>' +
         'id: ' + this.id + '<br/>' +
         'color: ' + this.color + '<br/>' +

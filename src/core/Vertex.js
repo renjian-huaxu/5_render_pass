@@ -16,6 +16,8 @@ export default class Vertex {
     }
 
     toString() {
+
         return 'MTHREE.Vertex ( position: ' + this.position + ', normal: ' + this.normal + ' )';
+        
     }
 }

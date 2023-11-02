@@ -9,6 +9,7 @@ const AdditiveBlending = 1;
 const SubtractiveBlending = 2;
 
 export {
+
     FlatShading,    
     GouraudShading,
     PhongShading,
@@ -16,4 +17,5 @@ export {
     NormalBlending,
     AdditiveBlending,
     SubtractiveBlending
+    
 }

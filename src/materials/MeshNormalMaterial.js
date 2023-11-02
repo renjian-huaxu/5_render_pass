@@ -21,6 +21,8 @@ export default class MeshNormalMaterial {
     }
 
     toString() {
+
         return 'THREE.MeshNormalMaterial';
+        
     }
 }

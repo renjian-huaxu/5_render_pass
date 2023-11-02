@@ -30,8 +30,8 @@
 
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
             init();
-			// loop();
-			setInterval(loop, 1000/60);
+			loop();
+			// setInterval(loop, 1000/60);
 
             function init() {
                 container = document.createElement('div');
@@ -46,14 +46,16 @@
 
 				// PLANE
 
-				mesh = new MThree.Mesh( new MThree.Plane( 100, 100 ), new MThree.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
-				mesh.position.y = -100;
+				mesh = new MThree.Mesh( 
+					new MThree.Plane( 100, 100 ), 
+					new MThree.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) 
+				)
+
+				mesh.position.y = 0;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.doubleSided = true;
 				mesh.updateMatrix();
 				scene.addObject(mesh);
-
-
 
 				// // CUBES
 
@@ -96,7 +98,6 @@
 				// mesh.updateMatrix();
 				// scene.add(mesh);
 				
-
                 webglRenderer = new MThree.WebGLRenderer(scene);
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( webglRenderer.domElement );

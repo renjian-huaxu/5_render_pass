@@ -3,11 +3,15 @@ import Object3D from "./Object3D";
 
 export default class Mesh extends Object3D {
 
-    constructor(geometry, material, normUVs) {
-        super(material)
+    constructor(geometry, materials, normUVs) {
+
+        super()
 
         this.geometry = geometry;
-        material && (this.material = material instanceof Array ? material : [material]);
+        
+        this.materials = materials 
+                        ? materials instanceof Array ? materials : [materials]
+                        : [];
 
         this.flipSided = false;
         this.doubleSided = false;
@@ -17,6 +21,7 @@ export default class Mesh extends Object3D {
         this.materialFaceGroup = {};
 
         this.sortFacesByMaterial();
+
         if (normUVs) this.normalizeUVs();
 
         this.geometry.computeBoundingBox();
@@ -24,34 +29,32 @@ export default class Mesh extends Object3D {
 
 
     materialHash(material) {
+        
 		let hash_array = [];
 
-		for ( let i = 0, l = material.length; i < l; i++ ) {
-
-			if ( material[ i ] == undefined ) {
+        material.forEach(material => {
+            if ( material== undefined ) {
 
 				hash_array.push( "undefined" );
 
 			} else {
 
-				hash_array.push( material[ i ].toString() );
+				hash_array.push( material.toString() );
 
 			}
-
-		}
+        })
 
 		return hash_array.join("_");
     }
 
     sortFacesByMaterial() {
-        var i, l, f, fl, face, material, vertices, mhash, ghash, hash_map = {};
 
-        for ( f = 0, fl = this.geometry.faces.length; f < fl; f++ ) {
+        const hash_map = {};
+
+        this.geometry.faces.forEach((face, index) => {
+            const material = face.material;
     
-            face = this.geometry.faces[ f ];
-            material = face.material;
-    
-            mhash = this.materialHash( material );
+            const mhash = this.materialHash( material );
     
             if ( hash_map[ mhash ] == undefined ) {
     
@@ -59,16 +62,16 @@ export default class Mesh extends Object3D {
     
             }
     
-            ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
-    
+            let ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
+            
             if ( this.materialFaceGroup[ ghash ] == undefined ) {
     
                 this.materialFaceGroup[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
     
             }
     
-            vertices = face instanceof Face3 ? 3 : 4;
-    
+            const vertices = face instanceof Face3 ? 3 : 4;
+
             if ( this.materialFaceGroup[ ghash ].vertices + vertices > 65535 ) {
     
                 hash_map[ mhash ].counter += 1;
@@ -82,15 +85,14 @@ export default class Mesh extends Object3D {
     
             }
     
-            this.materialFaceGroup[ ghash ].faces.push( f );
+            this.materialFaceGroup[ ghash ].faces.push( index );
             this.materialFaceGroup[ ghash ].vertices += vertices;
-    
-    
-        }
-       
+        });
+
     }
 
     normalizeUVs() {
+        
         this.geometry.uvs.forEach(uvArr => {
             uvArr.forEach(uv => {
                 if (uv.u != 1.0) uv.u = uv.u - Math.floor(uv.u);

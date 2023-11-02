@@ -6,8 +6,10 @@ const CubeMap = 2;
 export default class Texture {
 
     constructor(image, mapping) {
+
         this.image = image;
         this.mapping = mapping ? mapping : UVMapping;
+        
     }
 
     toString() {

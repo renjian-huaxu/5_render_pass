@@ -7,20 +7,24 @@ export default class Camera {
 
 		this.position = new Vector3( 0, 0, 0 );
 		this.target = { position: new Vector3( 0, 0, 0 ) };
-	
 		this.up = new Vector3( 0, 1, 0 );
-		this.matrix = new Matrix4();
+
 		this.projectionMatrix = Matrix4.makePerspective( fov, aspect, near, far );
-	
+
+		this.matrix = new Matrix4();
 		this.autoUpdateMatrix = true;
 		
 	}
 
 	updateMatrix() {
+
 		this.matrix.lookAt( this.position, this.target.position, this.up );
+
 	}
 
 	toString() {
+
 		return 'MTHREE.Camera ( ' + this.position + ', ' + this.target.position + ' )';
+		
 	}
 }

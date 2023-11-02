@@ -52,10 +52,14 @@ export default class Color {
     }
 
     updateStyleString() {
+
         this.__styleString = 'rgba(' + ~~( this.r * 255 ) + ',' + ~~( this.g * 255 ) + ',' + ~~( this.b * 255 ) + ',' + this.a + ')';
+   
     }
 
     toString() {
+
         return 'MTHREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', a: ' + this.a + ', hex: ' + this.hex + ' )';
+    
     }
 } 

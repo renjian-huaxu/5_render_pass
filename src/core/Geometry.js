@@ -89,52 +89,56 @@ export default class Geometry {
 	}
 
 	computeBoundingBox() {
-		if (this.vertices.length > 0) {
 
-			this.bbox = {
-				'x': [this.vertices[0].position.x, this.vertices[0].position.x],
-				'y': [this.vertices[0].position.y, this.vertices[0].position.y],
-				'z': [this.vertices[0].position.z, this.vertices[0].position.z]
-			};
+		// if (this.vertices.length > 0) {
 
-			this.vertices.forEach(vertex => {
+		// 	this.bbox = {
+		// 		'x': [this.vertices[0].position.x, this.vertices[0].position.x],
+		// 		'y': [this.vertices[0].position.y, this.vertices[0].position.y],
+		// 		'z': [this.vertices[0].position.z, this.vertices[0].position.z]
+		// 	};
 
-				if (vertex.position.x < this.bbox.x[0]) {
+		// 	this.vertices.forEach(vertex => {
 
-					this.bbox.x[0] = vertex.position.x;
+		// 		if (vertex.position.x < this.bbox.x[0]) {
 
-				} else if (vertex.position.x > this.bbox.x[1]) {
+		// 			this.bbox.x[0] = vertex.position.x;
 
-					this.bbox.x[1] = vertex.position.x;
+		// 		} else if (vertex.position.x > this.bbox.x[1]) {
 
-				}
+		// 			this.bbox.x[1] = vertex.position.x;
 
-				if (vertex.position.y < this.bbox.y[0]) {
+		// 		}
 
-					this.bbox.y[0] = vertex.position.y;
+		// 		if (vertex.position.y < this.bbox.y[0]) {
 
-				} else if (vertex.position.y > this.bbox.y[1]) {
+		// 			this.bbox.y[0] = vertex.position.y;
 
-					this.bbox.y[1] = vertex.position.y;
+		// 		} else if (vertex.position.y > this.bbox.y[1]) {
 
-				}
+		// 			this.bbox.y[1] = vertex.position.y;
 
-				if (vertex.position.z < this.bbox.z[0]) {
+		// 		}
 
-					this.bbox.z[0] = vertex.position.z;
+		// 		if (vertex.position.z < this.bbox.z[0]) {
 
-				} else if (vertex.position.z > this.bbox.z[1]) {
+		// 			this.bbox.z[0] = vertex.position.z;
 
-					this.bbox.z[1] = vertex.position.z;
+		// 		} else if (vertex.position.z > this.bbox.z[1]) {
 
-				}
+		// 			this.bbox.z[1] = vertex.position.z;
 
-			});
+		// 		}
 
-		}
+		// 	});
+
+		// }
+
 	}
 
 	toString() {
+
 		return 'MGeometry ( vertices: ' + this.vertices + ', faces: ' + this.faces + ' )';
+		
 	}
 }

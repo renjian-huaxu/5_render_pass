@@ -5,6 +5,7 @@ import { NormalBlending } from "./Material";
 export default class LineBasicMaterial {
 
     constructor(parameters) {
+
         this.color = new Color( 0xff0000 );
         this.opacity = 1;
         this.blending = NormalBlending;
@@ -21,6 +22,7 @@ export default class LineBasicMaterial {
     }
 
     toString() {
+        
         return 'THREE.LineBasicMaterial (<br/>' +
         'color: ' + this.color + '<br/>' +
         'opacity: ' + this.opacity + '<br/>' +

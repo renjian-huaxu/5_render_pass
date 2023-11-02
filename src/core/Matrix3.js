@@ -3,7 +3,9 @@
 export default class Matrix3 {
 
     constructor() {
+
         this.m = [];
+        
     }
 
     transpose() {

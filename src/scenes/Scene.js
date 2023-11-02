@@ -9,10 +9,13 @@ export default class Scene {
     }
 
     addObject(object) {
+
         this.objects.push(object);
+
     }
 
     removeObject(object) {
+
         for (var i = 0, l = this.objects.length; i < l; i++) {
 
             if (object == this.objects[i]) {
@@ -25,7 +28,9 @@ export default class Scene {
     }
 
     add(object) {
+
         this.addObject(object);
+
     }
 
     addLight(light) {
@@ -48,6 +53,8 @@ export default class Scene {
     };
 
     toString() {
+
         return 'MTHREE.Scene ( ' + this.objects + ' )';
+        
     }
 }
